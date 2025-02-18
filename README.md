@@ -1,4 +1,4 @@
-# NLU-2024 Laboratory
+# NLU-2025 Laboratories
 
 This repo contains all the laboratory lectures for the Natural Language Understanding course held at the University of Trento.
 <br>
@@ -8,14 +8,23 @@ This repo contains all the laboratory lectures for the Natural Language Understa
 We suggest you install [Anaconda](https://www.anaconda.com/download) on your laptop and import the conda environment that we have prepared for you. The reason for this is to give you the same library versions that we used to test the labs. However, if you are not a conda lover, you can manually install on your favourite virtual env the libraries listed in the `requirements.txt` file.
 
 ```bash
-conda env create -f nlu_env.yaml -n nlu24
-conda activate nlu24
+conda env create -f nlu_env.yaml -n nlu25
+conda activate nlu25
+```
+If you have a Mac or a Windows or you do not have a dedicated Nvidia gpu, you can install the environment in this way:
+
+```bash
+conda create -n nlu25 python=3.10.13
+conda activate nlu25
+pip install -r requirements_no_cuda.txt
 ```
 
 To launch a lab run this line of code:
 ```bash
 jupyter notebook
 ```
+
+
 Then, you have to choose the lab that you want to open. 
 
 <br>
@@ -30,12 +39,12 @@ The solutions of each lab will be uploaded after the corresponding lab lecture.
 ## Exam
 
 ### Instructions
-The mandatory projects are presented in lab 4 (LM) and 5 (NLU), while the optional project is presented in lab 6 (SA). The projects LM and NLU will give you 15/30 points each. SA is to reach the top grade i.e. 30 lode. 
+The mandatory projects are presented in lab 4 (LM) and 5 (NLU). The projects LM and NLU will give you 13/30 points each. You can earn the remaining points during the oral exam. 
 
 For each of the projects, you must write a small report following the LaTeX template in the zip folder `report_template.zip`. In particular, you have to write a mini-report of **max 1 page** (references, tables and images are excluded from the count) in which you explain all the parts of the project giving more weight to the part with higher points. **Reports longer than 1 page will not be evaluated**. The purpose of this is to give you a way to report **cleanly** the results and give you space to describe what you have done and/or the originality that you have added to the exercise. You can find more detail about the sections and relative content in the LaTeX template.
 
 ### Grading
-The final grade is based on:
+For each project, the final grade is based on:
 - Code review;
 - Report review;
 - Q&A at the exam.
@@ -46,7 +55,7 @@ The final grade is based on:
 
 The delivery must follow the directory schema that you can find in `exam/studentID_name_surname.zip`. 
 
-The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other for part 2, while for SA there is only part 1.   Inside them, there are the following files and folders: `main.py`, `functions.py` ,  `utils.py`,  `model.py`,  `README.md`, `/dataset` and `/bin`.
+The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other for part 2.   Inside them, there are the following files and folders: `main.py`, `functions.py` ,  `utils.py`,  `model.py`,  `README.md`, `/dataset` and `/bin`.
 
 - `utils.py`: you have to put all the functions needed to preprocess and load the dataset
 - `model.py`: the class of the model defined in PyTorch.
@@ -56,14 +65,14 @@ The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other 
 - `/dataset`: the files of that dataset that you used.
 - `/bin`: the binary files of the best models that you have trained.
 
- The **reports** have to be placed in the corresponding projects folders i.e. into the folders `LM`, `NLU` and `SA`.
+ The **reports** have to be placed in the corresponding projects folders i.e. into the folders `LM` and `NLU`.
 
 **Last but not least**, the code has to be **well-written** and **documented** with comments. Furthermore, the script has to **run** without bugs otherwise the exercise will not be evaluated. Jupyter notebooks are not accepted.
 
 <br>
 
 ### How to submit
-To submit your work you have to fill out this [Google form](https://forms.gle/2UNFNRDDAboTgeuG9). The work must be delivered **7 days before** the date of the session exam that you want to attend. You can do multiple submissions as we will check only the last one.
+To submit your work you have to fill out this [Google form](https://forms.gle/CFxQ87ZLZVvc7cvs8). The work must be delivered **7 days before** the date of the session exam that you want to attend. You can do multiple submissions as we will check only the last one.
 
 <br>
 
