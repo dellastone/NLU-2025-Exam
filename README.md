@@ -77,4 +77,4 @@ To submit your work you have to fill out this [Google form](https://forms.gle/CF
 <br>
 
 ## Acknowledgements
-The notebooks that you can find here are an adaptation of the labs created by our colleague [Evgeny A. Stepanov](https://github.com/esrel).
+The notebooks that you can find here are an adaptation of the labs created by our colleague [Evgeny A. Stepanov](https://github.com/esrel). Also, we want to thank all the students who gave us feedback for improving these notebooks. 
