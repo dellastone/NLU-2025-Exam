@@ -25,7 +25,7 @@ jupyter notebook
 ```
 
 
-Then, you have to choose the lab that you want to open. 
+Then, you have to choose the lab that you want to open.
 
 <br>
 
@@ -39,21 +39,23 @@ The solutions of each lab will be uploaded after the corresponding lab lecture.
 ## Exam
 
 ### Instructions
-The mandatory projects are presented in lab 4 (LM) and 5 (NLU). The projects LM and NLU will give you 13/30 points each. You can earn the remaining points during the oral exam. 
 
-For each of the projects, you must write a small report following the LaTeX template in the zip folder `report_template.zip`. In particular, you have to write a mini-report of **max 1 page** (references, tables and images are excluded from the count) in which you explain all the parts of the project giving more weight to the part with higher points. **Reports longer than 1 page will not be evaluated**. The purpose of this is to give you a way to report **cleanly** the results and give you space to describe what you have done and/or the originality that you have added to the exercise. You can find more detail about the sections and relative content in the LaTeX template.
+There will be one project assignment that will be graded (80% of the final exam grade) and Q&A during the oral exam on any of the topics covered in the class (lectures and labs) (20% of the final exam grade).
+The mandatory project consists of two parts that are presented in lab 4 (LM) and 5 (NLU).
+
+For both parts of the project, you must write a small report following the LaTeX template in the zip folder `report_template.zip`. In particular, you have to write a mini-report of **max 1 page** (references, tables and images are excluded from the count) in which you explain all the parts of the project giving more weight to the part with higher points. **Reports longer than 1 page will not be evaluated**. The purpose of this is to give you a way to report **cleanly** the results and give you space to describe what you have done and/or the originality that you have added to the exercise. You can find more detail about the sections and relative content in the LaTeX template.
 
 ### Grading
-For each project, the final grade is based on:
+The final grade is based on:
 - Code review;
 - Report review;
 - Q&A at the exam.
-    -  The questions will be related to the delivered projects, the associated models/solutions and concepts supporting the theory.
+    -  The questions will be related to the delivered project, and any of the topics covered in the class and during the labs.
 
 
 ### Submission format
 
-The delivery must follow the directory schema that you can find in `exam/studentID_name_surname.zip`. 
+The delivery must follow the directory schema that you can find in `exam/studentID_name_surname.zip`.
 
 The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other for part 2.   Inside them, there are the following files and folders: `main.py`, `functions.py` ,  `utils.py`,  `model.py`,  `README.md`, `/dataset` and `/bin`.
 
@@ -65,7 +67,7 @@ The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other 
 - `/dataset`: the files of that dataset that you used.
 - `/bin`: the binary files of the best models that you have trained.
 
- The **reports** have to be placed in the corresponding projects folders i.e. into the folders `LM` and `NLU`.
+ The **reports** have to be placed in the corresponding folders i.e. into the folders `LM` and `NLU`.
 
 **Last but not least**, the code has to be **well-written** and **documented** with comments. Furthermore, the script has to **run** without bugs otherwise the exercise will not be evaluated. Jupyter notebooks are not accepted.
 
@@ -77,4 +79,4 @@ To submit your work you have to fill out this [Google form](https://forms.gle/CF
 <br>
 
 ## Acknowledgements
-The notebooks that you can find here are an adaptation of the labs created by our colleague [Evgeny A. Stepanov](https://github.com/esrel). Also, we want to thank all the students who gave us feedback for improving these notebooks. 
+The notebooks that you can find here are an adaptation of the labs created by our colleague [Evgeny A. Stepanov](https://github.com/esrel). Also, we want to thank all the students who gave us feedback for improving these notebooks.
