@@ -16,7 +16,7 @@ If you have a Mac or a Windows or you do not have a dedicated Nvidia gpu, you ca
 ```bash
 conda create -n nlu25 python=3.10.13
 conda activate nlu25
-pip install -r requirements_no_cuda.txt
+pip install -r requirements.txt
 ```
 
 To launch a lab run this line of code:
