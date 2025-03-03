@@ -11,6 +11,13 @@ We suggest you install [Anaconda](https://www.anaconda.com/download) on your lap
 conda env create -f nlu_env.yaml -n nlu25
 conda activate nlu25
 ```
+If you have a Mac or a Windows or you do not have a dedicated Nvidia gpu, you can install the environment in this way:
+
+```bash
+conda create -n nlu25 python=3.10.13
+conda activate nlu25
+pip install -r requirements_no_cuda.txt
+```
 
 To launch a lab run this line of code:
 ```bash
