@@ -57,7 +57,7 @@ The final grade is based on:
 
 The delivery must follow the directory schema that you can find in `exam/studentID_name_surname.zip`.
 
-The `LM` and `NLU` folders contain two sub-folders one for part 1 and the other for part 2.   Inside them, there are the following files and folders: `main.py`, `functions.py` ,  `utils.py`,  `model.py`,  `README.md`, `/dataset` and `/bin`.
+The `LM` and `NLU` folders contain two sub-folders one for part A and the other for part B.   Inside them, there are the following files and folders: `main.py`, `functions.py` ,  `utils.py`,  `model.py`,  `README.md`, `/dataset` and `/bin`.
 
 - `utils.py`: you have to put all the functions needed to preprocess and load the dataset
 - `model.py`: the class of the model defined in PyTorch.
