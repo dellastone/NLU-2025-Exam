@@ -1,0 +1,5 @@
+Namespace(train=True, test=False, model='LSTM', use_dropout=True, optimizer='AdamW', hidden_dim=128, embedding_dim=128, learning_rate=0.001, clip=5, patience=3, epochs=100, batch_size=256, save_model=False)
+Test ppl:  128.33612601994005
+
+Namespace(train=True, test=False, model='RNN', use_dropout=False, optimizer='SGD', hidden_dim=128, embedding_dim=128, learning_rate=1.0, clip=5, patience=3, epochs=100, batch_size=256)
+Test ppl:  193.2947372510801

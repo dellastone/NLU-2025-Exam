@@ -13,7 +13,7 @@ import copy
 import math
 import numpy as np
 
-def load_data(device='cuda'):
+def load_data(device='cuda', batch_size=64):
     """
     Load the dataset
     """
@@ -30,9 +30,9 @@ def load_data(device='cuda'):
     dev_dataset = PennTreeBank(dev_raw, lang)
     test_dataset = PennTreeBank(test_raw, lang)
     
-    train_loader = DataLoader(train_dataset, batch_size=64, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device),  shuffle=True)
-    dev_loader = DataLoader(dev_dataset, batch_size=128, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device))
-    test_loader = DataLoader(test_dataset, batch_size=128, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"],device = device))
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device),  shuffle=True)
+    dev_loader = DataLoader(dev_dataset, batch_size=2*batch_size, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device))
+    test_loader = DataLoader(test_dataset, batch_size=2*batch_size, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"],device = device))
     
     return train_loader, dev_loader, test_loader, lang
 
@@ -98,17 +98,20 @@ def start_training(args):
     """
     print(args)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f'Device {device}')
     
     #load dataset
-    train_dataloader, dev_dataloader, test_dataloader, lang = load_data(device)
+    batch_size = args.batch_size
+    train_dataloader, dev_dataloader, test_dataloader, lang = load_data(device, batch_size)
     vocab_len = len(lang.word2id)
     #save arguments
     model_name = args.model
+    
     hidden_dim = args.hidden_dim
     emb_dim = args.embedding_dim
     lr = args.learning_rate
     clip = args.clip
-    parience = args.patience
+    patience = args.patience
     epochs = args.epochs
     use_dropout = args.use_dropout
     optimizer = args.optimizer
@@ -152,7 +155,7 @@ def start_training(args):
             if  ppl_dev < best_ppl: # the lower, the better
                 best_ppl = ppl_dev
                 best_model = copy.deepcopy(model).to('cpu')
-                patience = 3
+                patience = args.patience
             else:
                 patience -= 1
                 
@@ -162,6 +165,10 @@ def start_training(args):
     best_model.to(device)
     final_ppl,  _ = eval_loop(test_dataloader, criterion_eval, best_model)    
     print('Test ppl: ', final_ppl)
+    if args.save_model:
+        print('saving model')
+        torch.save(best_model.state_dict(), f'./model_bin/{model_name}_model.pth')
+
 
 def get_arguments():
     """
@@ -212,21 +219,21 @@ def get_arguments():
         '--hidden_dim',
         type=int,
         help='Hidden dimension of the model',
-        default=200
+        default=128
     )
     
     parser.add_argument(
         '--embedding_dim',
         type=int,
         help='Embedding dimension of the model',
-        default=300
+        default=128
     )
     
     parser.add_argument(
         '--learning_rate',
         type=float,
         help='Learning rate of the model',
-        default=0.0001
+        default=1.0
     )
     
     parser.add_argument(
@@ -248,6 +255,20 @@ def get_arguments():
         type=int,
         help='Number of epochs',
         default=100
+    )
+
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        help='Batch size',
+        default=256
+    )
+
+    parser.add_argument(
+        '--save_model',
+        action='store_true',
+        help='Save the model',
+        default=False
     )
     
     return parser.parse_args()
