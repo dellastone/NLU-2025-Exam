@@ -20,9 +20,9 @@ def load_data(device='cuda'):
     print('Loading the dataset')
     
     
-    train_raw = read_file("dataset/PennTreeBank/ptb.train.txt")
-    dev_raw = read_file("dataset/PennTreeBank/ptb.valid.txt")
-    test_raw = read_file("dataset/PennTreeBank/ptb.test.txt")
+    train_raw = read_file("../dataset/PennTreeBank/ptb.train.txt")
+    dev_raw = read_file("../dataset/PennTreeBank/ptb.valid.txt")
+    test_raw = read_file("../dataset/PennTreeBank/ptb.test.txt")
     
     lang = Lang(train_raw, ["<pad>", "<eos>"])
     
@@ -32,7 +32,7 @@ def load_data(device='cuda'):
     
     train_loader = DataLoader(train_dataset, batch_size=64, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device),  shuffle=True)
     dev_loader = DataLoader(dev_dataset, batch_size=128, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"], device = device))
-    test_loader = DataLoader(test_dataset, batch_size=128, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"]), device = device)
+    test_loader = DataLoader(test_dataset, batch_size=128, collate_fn=partial(collate_fn, pad_token=lang.word2id["<pad>"],device = device))
     
     return train_loader, dev_loader, test_loader, lang
 
