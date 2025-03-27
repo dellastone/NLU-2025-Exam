@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 class LM_model(nn.Module):
-    def __init__(self, model, hidden_dim, emb_dim, output_size, use_dropout, pad_index, emb_dropout=0.1, out_dropout=0.1):
+    def __init__(self, model, hidden_dim, emb_dim, output_size, use_dropout, pad_index, emb_dropout=0.6, out_dropout=0.6):
         super(LM_model, self).__init__()
         self.hidden_dim = hidden_dim
         self.emb_dim = emb_dim

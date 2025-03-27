@@ -12,7 +12,7 @@ from tqdm import tqdm
 import copy
 import math
 import numpy as np
-
+import wandb
 def load_data(device='cuda', batch_size=64):
     """
     Load the dataset
@@ -99,6 +99,9 @@ def start_training(args):
     print(args)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Device {device}')
+
+    #initilize wandb
+    wandb.init(entity='della_stone',project="NLU", config=args)
     
     #load dataset
     batch_size = args.batch_size
@@ -115,6 +118,7 @@ def start_training(args):
     epochs = args.epochs
     use_dropout = args.use_dropout
     optimizer = args.optimizer
+    dropout = args.dropout
     #load model
     
     if model_name == 'RNN':
@@ -124,8 +128,7 @@ def start_training(args):
     else:
         print('Model not implemented')
         exit()
-        
-    model = LM_model(model_name, hidden_dim, emb_dim, vocab_len, use_dropout, pad_index=lang.word2id["<pad>"]).to(device)
+    model = LM_model(model_name, hidden_dim, emb_dim, vocab_len, use_dropout, pad_index=lang.word2id["<pad>"], emb_dropout=dropout, out_dropout=dropout).to(device)
     model.apply(init_weights)
 
     if optimizer == 'SGD':
@@ -146,21 +149,35 @@ def start_training(args):
     #If the PPL is too high try to change the learning rate
     for epoch in pbar:
         loss = train_loop(train_dataloader, optimizer, criterion_train, model, clip)    
-        if epoch % 1 == 0:
-            sampled_epochs.append(epoch)
-            losses_train.append(np.asarray(loss).mean())
-            ppl_dev, loss_dev = eval_loop(dev_dataloader, criterion_eval, model)
-            losses_dev.append(np.asarray(loss_dev).mean())
-            pbar.set_description("PPL: %f" % ppl_dev)
-            if  ppl_dev < best_ppl: # the lower, the better
-                best_ppl = ppl_dev
-                best_model = copy.deepcopy(model).to('cpu')
-                patience = args.patience
-            else:
-                patience -= 1
-                
-            if patience <= 0: # Early stopping with patience
-                break # Not nice but it keeps the code clean
+        # Sample and log metrics every epoch (or adjust frequency if needed)
+        sampled_epochs.append(epoch)
+        train_loss = np.asarray(loss).mean()
+        losses_train.append(train_loss)
+        
+        ppl_dev, loss_dev = eval_loop(dev_dataloader, criterion_eval, model)
+        dev_loss = np.asarray(loss_dev).mean()
+        losses_dev.append(dev_loss)
+        
+        pbar.set_description("PPL: %f" % ppl_dev)
+        
+        # Log metrics to WandB
+        wandb.log({
+            "epoch": epoch,
+            "train_loss": train_loss,
+            "dev_loss": dev_loss,
+            "dev_ppl": ppl_dev
+        })
+        
+        # Early stopping and best model saving based on dev perplexity
+        if ppl_dev < best_ppl:  # the lower, the better
+            best_ppl = ppl_dev
+            best_model = copy.deepcopy(model).to(device)
+            patience = args.patience
+        else:
+            patience -= 1
+
+        if patience <= 0:  # Early stopping with patience
+            break
 
     best_model.to(device)
     final_ppl,  _ = eval_loop(test_dataloader, criterion_eval, best_model)    
@@ -168,6 +185,7 @@ def start_training(args):
     if args.save_model:
         print('saving model')
         torch.save(best_model.state_dict(), f'./model_bin/{model_name}_model.pth')
+    wandb.finish()
 
 
 def get_arguments():
@@ -247,7 +265,7 @@ def get_arguments():
         '--patience',
         type=int,
         help='Patience for early stopping',
-        default=3
+        default=5
     )
     
     parser.add_argument(
@@ -269,6 +287,13 @@ def get_arguments():
         action='store_true',
         help='Save the model',
         default=False
+    )
+
+    parser.add_argument(
+        '--dropout',
+        type=float,
+        help='Dropout rate',
+        default=0.1
     )
     
     return parser.parse_args()
