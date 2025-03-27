@@ -129,6 +129,8 @@ def start_training(args):
         print('Model not implemented')
         exit()
     model = LM_model(model_name, hidden_dim, emb_dim, vocab_len, use_dropout, pad_index=lang.word2id["<pad>"], emb_dropout=dropout, out_dropout=dropout).to(device)
+    #print the model number of parameters
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
     model.apply(init_weights)
 
     if optimizer == 'SGD':
@@ -184,7 +186,14 @@ def start_training(args):
     print('Test ppl: ', final_ppl)
     if args.save_model:
         print('saving model')
-        torch.save(best_model.state_dict(), f'./model_bin/{model_name}_model.pth')
+        #create the date_time folder inside model_bin
+        import os
+        from datetime import datetime
+        now = datetime.now()
+        dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+        os.makedirs(f"model_bin/{dt_string}")
+        torch.save(best_model.state_dict(), f"model_bin/{dt_string}/{model_name}_model.pth")
+
     wandb.finish()
 
 
