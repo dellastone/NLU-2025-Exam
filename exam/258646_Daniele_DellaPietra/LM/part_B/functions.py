@@ -132,7 +132,6 @@ def start_training(args):
     #print the model number of parameters
     print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
     model.apply(init_weights)
-
     if optimizer == 'SGD':
         optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     elif optimizer == 'AdamW':
@@ -140,7 +139,8 @@ def start_training(args):
         
     criterion_train = nn.CrossEntropyLoss(ignore_index=lang.word2id["<pad>"])
     criterion_eval = nn.CrossEntropyLoss(ignore_index=lang.word2id["<pad>"], reduction='sum')   
-    
+
+
     print('Training the model')
     losses_train = []
     losses_dev = []
@@ -148,18 +148,34 @@ def start_training(args):
     best_ppl = math.inf
     best_model = None
     pbar = tqdm(range(1,epochs))
+
     #If the PPL is too high try to change the learning rate
     for epoch in pbar:
-        loss = train_loop(train_dataloader, optimizer, criterion_train, model, clip)    
-        # Sample and log metrics every epoch (or adjust frequency if needed)
+        loss = train_loop(train_dataloader, optimizer, criterion_train, model, clip) 
+
         sampled_epochs.append(epoch)
         train_loss = np.asarray(loss).mean()
-        losses_train.append(train_loss)
-        
-        ppl_dev, loss_dev = eval_loop(dev_dataloader, criterion_eval, model)
-        dev_loss = np.asarray(loss_dev).mean()
-        losses_dev.append(dev_loss)
-        
+        losses_train.append(train_loss)   
+
+        if "t0" in optimizer.param_groups[0]:
+            tmp = {}
+            for prm in model.parameters():
+                tmp[prm] = prm.data.clone()
+                prm.data = optimizer.state[prm]['ax'].clone()
+
+                        
+            ppl_dev, loss_dev = eval_loop(dev_dataloader, criterion_eval, model)
+            dev_loss = np.asarray(loss_dev).mean()
+            losses_dev.append(dev_loss)
+
+            for prm in model.parameters():
+                prm.data = tmp[prm].clone()
+
+        else:
+            ppl_dev, loss_dev = eval_loop(dev_dataloader, criterion_eval, model)
+            dev_loss = np.asarray(loss_dev).mean()
+            losses_dev.append(dev_loss)
+
         pbar.set_description("PPL: %f" % ppl_dev)
         
         # Log metrics to WandB
@@ -169,7 +185,7 @@ def start_training(args):
             "dev_loss": dev_loss,
             "dev_ppl": ppl_dev
         })
-        
+
         # Early stopping and best model saving based on dev perplexity
         if ppl_dev < best_ppl:  # the lower, the better
             best_ppl = ppl_dev
@@ -178,8 +194,12 @@ def start_training(args):
         else:
             patience -= 1
 
-        if patience <= 0:  # Early stopping with patience
-            break
+        if patience <= 0: 
+            if "t0" not in optimizer.param_groups[0]:
+                print("NT-ASGD applied")
+                optimizer = torch.optim.ASGD(model.parameters(), lr=lr, t0=0, lambd=0.)
+                patience = args.patience
+
 
     best_model.to(device)
     final_ppl,  _ = eval_loop(test_dataloader, criterion_eval, best_model)    
