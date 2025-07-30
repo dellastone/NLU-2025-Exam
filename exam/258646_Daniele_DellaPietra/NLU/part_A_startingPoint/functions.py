@@ -249,7 +249,19 @@ def get_arguments():
         help='Test the model',
         default=False
     )
-    
+    parser.add_argument(
+        '--epochs',
+        type=int,
+        help='Number of epochs',
+        default=100
+    )
+
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        help='Batch size',
+        default=512
+    )
 
     return parser.parse_args()
     
