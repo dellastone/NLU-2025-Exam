@@ -246,21 +246,21 @@ def get_arguments():
         '--hidden_dim',
         type=int,
         help='Hidden dimension of the model',
-        default=128
+        default=1024
     )
     
     parser.add_argument(
         '--embedding_dim',
         type=int,
         help='Embedding dimension of the model',
-        default=128
+        default=1024
     )
     
     parser.add_argument(
         '--learning_rate',
         type=float,
         help='Learning rate of the model',
-        default=1.0
+        default=0.001
     )
     
     parser.add_argument(
@@ -288,7 +288,7 @@ def get_arguments():
         '--batch_size',
         type=int,
         help='Batch size',
-        default=256
+        default=512
     )
 
     parser.add_argument(
@@ -302,7 +302,7 @@ def get_arguments():
         '--dropout',
         type=float,
         help='Dropout rate',
-        default=0.1
+        default=0.6
     )
     
     return parser.parse_args()
