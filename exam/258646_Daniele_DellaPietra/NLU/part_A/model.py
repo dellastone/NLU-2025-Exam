@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 class ATISModel(nn.Module):
-    def __init__(self, hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, bidirectional=False, dropout=0.1, pad_index=0):
+    def __init__(self, hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, bidirectional=True, dropout=0.1, pad_index=0):
         super(ATISModel, self).__init__()
         self.embedding = nn.Embedding(vocab_len, emb_size, padding_idx=pad_index)
         self.dropout = nn.Dropout(dropout)

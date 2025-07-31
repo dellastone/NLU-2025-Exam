@@ -180,14 +180,14 @@ def start_training(args):
     hid_size = 200
     emb_size = 300
 
-    lr = 0.0001 # learning rate
+    lr = 0.0005 # learning rate
     clip = 5 # Clip the gradient
 
     out_slot = len(lang.slot2id)
     out_int = len(lang.intent2id)
     vocab_len = len(lang.word2id)
 
-    model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, pad_index=PAD_TOKEN).to(device)
+    model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=2, pad_index=PAD_TOKEN).to(device)
     model.apply(init_weights)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -260,7 +260,7 @@ def get_arguments():
         '--batch_size',
         type=int,
         help='Batch size',
-        default=512
+        default=128
     )
 
     return parser.parse_args()
