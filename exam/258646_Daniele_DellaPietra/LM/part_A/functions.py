@@ -19,7 +19,6 @@ def load_data(device='cuda', batch_size=64):
     """
     print('Loading the dataset')
     
-    
     train_raw = read_file("../dataset/PennTreeBank/ptb.train.txt")
     dev_raw = read_file("../dataset/PennTreeBank/ptb.valid.txt")
     test_raw = read_file("../dataset/PennTreeBank/ptb.test.txt")
@@ -128,7 +127,9 @@ def start_training(args):
     else:
         print('Model not implemented')
         exit()
+        
     model = LM_model(model_name, hidden_dim, emb_dim, vocab_len, use_dropout, pad_index=lang.word2id["<pad>"], emb_dropout=dropout, out_dropout=dropout).to(device)
+    
     #print the model number of parameters
     print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
     model.apply(init_weights)

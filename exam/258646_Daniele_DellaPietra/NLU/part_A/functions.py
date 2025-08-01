@@ -177,24 +177,26 @@ def start_training(args):
         batch_size=args.batch_size
     )
     
-    hid_size = 200
-    emb_size = 300
+    hid_size = args.hidden_dim
+    emb_size = args.embedding_dim
 
-    lr = 0.0005 # learning rate
-    clip = 5 # Clip the gradient
+    lr = args.learning_rate
+    clip = args.clip
+    
+    n_epochs = args.epochs
+    patience = args.patience
 
     out_slot = len(lang.slot2id)
     out_int = len(lang.intent2id)
     vocab_len = len(lang.word2id)
 
-    model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=2, pad_index=PAD_TOKEN).to(device)
+    model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, use_dropout=args.use_dropout, dropout=args.dropout, bidirectional=args.bidirectional, pad_index=PAD_TOKEN).to(device)
     model.apply(init_weights)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
     criterion_slots = nn.CrossEntropyLoss(ignore_index=PAD_TOKEN)
     criterion_intents = nn.CrossEntropyLoss() # Because we do not have the pad token
-    n_epochs = 200
-    patience = 3
+
     losses_train = []
     losses_dev = []
     sampled_epochs = []

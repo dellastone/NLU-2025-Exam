@@ -195,10 +195,12 @@ def start_training(args):
             patience -= 1
 
         if patience <= 0: 
-            if "t0" not in optimizer.param_groups[0]:
+            if args.nt_asgd and "t0" not in optimizer.param_groups[0]:
                 print("NT-ASGD applied")
                 optimizer = torch.optim.ASGD(model.parameters(), lr=lr, t0=0, lambd=0.)
                 patience = args.patience
+            else:
+                break
 
 
     best_model.to(device)

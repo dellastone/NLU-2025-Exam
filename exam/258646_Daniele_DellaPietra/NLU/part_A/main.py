@@ -1,5 +1,3 @@
-# This file is used to run your functions and print the results
-# Please write your fuctions or classes in the functions.py
 """
 ## Part 2.A
 As for the first part of the project (LM), you have to apply these two modifications incrementally. Also in this case you may have to play with the hyperparameters and optimizers to improve the performance. 
@@ -14,13 +12,43 @@ Modify the baseline architecture Model IAS by:
 ***Dataset to use: ATIS***
 
 """
-# Import everything from functions.py file
-from functions import *
+import yaml
+import argparse
+from functions import *  # your existing imports
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='experiments_config.yaml',
+                        help='YAML file listing all experiments')
+    parser.add_argument('--save_model', action='store_true')
+    # (you can still allow overriding individual params if you like)
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    #Wrtite the code to load the datasets and to run your functions
-    # Print the results
-    args = get_arguments()
-    
-    if args.train:
-        start_training(args)
+    args = parse_args()
+
+    # Load all experiments
+    with open(args.config) as f:
+        cfg = yaml.safe_load(f)
+
+    for exp in cfg['experiments']:
+        print(f"\n--- Running experiment: {exp['name']} ---")
+        # build a namespace with defaults + override from the yaml
+        exp_args = argparse.Namespace(
+            train=exp['train'],
+            test=False,
+            use_dropout=exp['use_dropout'],
+            bidirectional=exp['bidirectional'],
+            dropout=exp['dropout'],
+            learning_rate=exp['learning_rate'],
+            batch_size=exp['batch_size'], 
+            hidden_dim=exp['hidden_dim'],
+            embedding_dim=exp['embedding_dim'],
+            clip=exp['clip'],
+            patience=exp['patience'],
+            epochs=exp['epochs'],
+            save_model=args.save_model
+        )
+
+        # call your existing training launcher
+        start_training(exp_args)

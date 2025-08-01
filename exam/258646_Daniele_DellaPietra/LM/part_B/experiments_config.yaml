@@ -1,0 +1,35 @@
+# experiments_config.yaml
+experiments:
+
+  - name: lstm_weight_tying
+    model: LSTM
+    optimizer: SGD
+    use_dropout: false
+    dropout: 0.0
+    learning_rate: 1.3
+    hidden_dim: 256
+    embedding_dim: 256
+    batch_size: 32
+    nt_asgd: false
+
+  - name: lstm_weight_tying_var_dropout
+    model: LSTM
+    optimizer: SGD
+    use_dropout: true
+    dropout: 0.5
+    learning_rate: 1.3
+    hidden_dim: 256
+    embedding_dim: 256
+    batch_size: 32
+    nt_asgd: false
+
+  - name: lstm_weight_tying_var_ntasgd
+    model: LSTM
+    optimizer: SGD
+    use_dropout: true
+    dropout: 0.5
+    learning_rate: 1.3
+    hidden_dim: 256
+    embedding_dim: 256
+    batch_size: 32
+    nt_asgd: true

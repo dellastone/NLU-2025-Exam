@@ -1,0 +1,42 @@
+# experiments_config.yaml
+experiments:
+  - name: base_no_dropout_no_bidirectional
+    batch_size: 128
+    hidden_dim: 200
+    embedding_dim: 300
+    learning_rate: 0.0005
+    clip: 5
+    patience: 5
+    dropout: 0.3
+    use_dropout: false
+    bidirectional: false
+    train: true
+    epochs: 200
+
+
+  - name: base_dropout_no_bidirectional
+    batch_size: 128
+    hidden_dim: 200
+    embedding_dim: 300
+    learning_rate: 0.0005
+    clip: 5
+    patience: 5
+    dropout: 0.3
+    use_dropout: false
+    bidirectional: true
+    train: true
+    epochs: 200
+
+
+  - name: base_dropout_bidirectional
+    batch_size: 128
+    hidden_dim: 200
+    embedding_dim: 300
+    learning_rate: 0.0005
+    clip: 5
+    patience: 5
+    dropout: 0.3
+    use_dropout: true
+    bidirectional: true
+    train: true
+    epochs: 200

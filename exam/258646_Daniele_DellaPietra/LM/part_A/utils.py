@@ -1,6 +1,6 @@
 import torch
 import torch.utils.data as data
-# Add functions or classes used for data loading and preprocessing
+
 def read_file(path, eos_token="<eos>"):
     output = []
     with open(path, "r") as f:

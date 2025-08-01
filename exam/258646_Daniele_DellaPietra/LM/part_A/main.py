@@ -15,15 +15,44 @@ These are two links to the state-of-the-art papers which use vanilla RNN [paper1
 3. Replace SGD with AdamW --> [link](https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html)
 
 """
-from functions import *
+import yaml
+import argparse
+from functions import *  # your existing imports
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='experiments_config.yaml',
+                        help='YAML file listing all experiments')
+    parser.add_argument('--save_model', action='store_true')
+    # (you can still allow overriding individual params if you like)
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    #Wrtite the code to load the datasets and to run your functions
-    # Print the results
-    args = get_arguments()
-    
-    if args.train:
-        start_training(args)
-    # elif args.test:
-    #     start_testing(args)
-  
+    args = parse_args()
+
+    # Load all experiments
+    with open(args.config) as f:
+        cfg = yaml.safe_load(f)
+
+    for exp in cfg['experiments']:
+        print(f"\n--- Running experiment: {exp['name']} ---")
+        # build a namespace with defaults + override from the yaml
+        exp_args = argparse.Namespace(
+            train=True,
+            test=False,
+            model=exp['model'],
+            optimizer=exp['optimizer'],
+            use_dropout=exp['use_dropout'],
+            dropout=exp['dropout'],
+            learning_rate=exp['learning_rate'],
+            batch_size=exp['batch_size'], 
+            hidden_dim=exp['hidden_dim'],
+            embedding_dim=exp['embedding_dim'],
+            clip=5,
+            patience=5,
+            epochs=100,
+            save_model=args.save_model
+        )
+
+        # call your existing training launcher
+        start_training(exp_args)
