@@ -18,12 +18,39 @@ The models that you can experiment with are [*BERT-base* or *BERT-large*](https:
 
 """
 # Import everything from functions.py file
-from functions import *
+import yaml
+import argparse
+from functions import *  # your existing imports
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='experiments_config.yaml',
+                        help='YAML file listing all experiments')
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    #Wrtite the code to load the datasets and to run your functions
-    # Print the results
-    args = get_arguments()
-    
-    if args.train:
-        start_training(args)
+    args = parse_args()
+
+    # Load all experiments
+    with open(args.config) as f:
+        cfg = yaml.safe_load(f)
+
+    for exp in cfg['experiments']:
+        print(f"\n--- Running experiment: {exp['name']} ---")
+        # build a namespace with defaults + override from the yaml
+        exp_args = argparse.Namespace(
+            train=True,
+            test=False,
+            lr=exp['learning_rate'],
+            batch_size=exp['batch_size'], 
+            clip=exp['clip'],
+            patience=exp['patience'],
+            epochs=exp['epochs'],
+            data_dir=exp['data_dir'],
+            bert_model=exp['bert_model'],
+            max_len=exp['max_len'],
+        )
+
+        # call your existing training launcher
+        start_training(exp_args)
+        
