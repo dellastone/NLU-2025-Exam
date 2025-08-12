@@ -107,6 +107,7 @@ def start_training(args):
         num_intent_labels=len(lang.intent2id),
         num_slot_labels=len(lang.slot2id)
     ).to(device)
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
     total_steps = len(train_loader) * args.epochs

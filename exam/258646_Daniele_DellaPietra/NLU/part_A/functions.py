@@ -191,6 +191,8 @@ def start_training(args):
     vocab_len = len(lang.word2id)
 
     model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, use_dropout=args.use_dropout, dropout=args.dropout, bidirectional=args.bidirectional, pad_index=PAD_TOKEN).to(device)
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+
     model.apply(init_weights)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
