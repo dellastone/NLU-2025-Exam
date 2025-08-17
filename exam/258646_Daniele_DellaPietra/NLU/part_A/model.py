@@ -21,35 +21,30 @@ class ATISModel(nn.Module):
         # If bidirectional, hidden features double
         feat_mult = 2 if bidirectional else 1
         self.slot_out = nn.Linear(hid_size * feat_mult, out_slot)
-        self.intent_out = nn.Linear(hid_size, out_int)
+        self.intent_out = nn.Linear(hid_size * feat_mult, out_int)
 
     def forward(self, utterance, seq_lengths):
-        # utterance: [batch_size, seq_len]
-        utt_emb = self.embedding(utterance)  # [B, L, emb]
-        utt_emb = self.dropout(utt_emb) if self.use_dropout else utt_emb
+        utt_emb = self.embedding(utterance)               # [B, L, E]
+        if self.use_dropout:
+            utt_emb = self.dropout(utt_emb)
 
-        packed = pack_padded_sequence(utt_emb, seq_lengths.cpu().numpy(), batch_first=True)
+        packed = pack_padded_sequence(
+            utt_emb, seq_lengths.cpu(), batch_first=True, enforce_sorted=False
+        )
         packed_output, (h_n, c_n) = self.utt_encoder(packed)
-        unpacked, _ = pad_packed_sequence(packed_output, batch_first=True)
-        unpacked = self.dropout(unpacked) if self.use_dropout else unpacked
-        last_hidden = h_n[-1, :, :]
-        # # h_n: [num_layers * num_directions, B, hid_size]
-        # # Take last layer's hidden states
-        # if self.utt_encoder.bidirectional:
-        #     # Concatenate forward and backward
-        #     forward_h = h_n[-2, :, :]
-        #     backward_h = h_n[-1, :, :]
-        #     last_hidden = torch.cat([forward_h, backward_h], dim=1)  # [B, hid*2]
-        # else:
-        #     last_hidden = h_n[-1,:,:]  # [B, hid]
+        unpacked, _ = pad_packed_sequence(packed_output, batch_first=True)  # [B, L, H*dirs]
+        if self.use_dropout:
+            unpacked = self.dropout(unpacked)
 
-        # last_hidden = self.dropout(last_hidden) if self.use_dropout else last_hidden
+        if self.utt_encoder.bidirectional:
+            last_hidden = torch.cat([h_n[-2], h_n[-1]], dim=1)  # [B, 2H]
+        else:
+            last_hidden = h_n[-1]                               # [B, H]
+        if self.use_dropout:
+            last_hidden = self.dropout(last_hidden)
 
-        # Slot logits: [B, L, slots]
-        slot_logits = self.slot_out(unpacked)
-        # Convert to [B, slots, L] for loss
-        slots = slot_logits.permute(0, 2, 1)
+        slot_logits = self.slot_out(unpacked)   # [B, L, slots]
+        slots = slot_logits.permute(0, 2, 1)    # [B, slots, L] for CE loss
 
-        # Intent logits: [B, intents]
-        intent = self.intent_out(last_hidden)
+        intent = self.intent_out(last_hidden)   # [B, intents]
         return slots, intent
