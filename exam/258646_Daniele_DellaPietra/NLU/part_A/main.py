@@ -35,6 +35,7 @@ if __name__ == "__main__":
         print(f"\n--- Running experiment: {exp['name']} ---")
         # build a namespace with defaults + override from the yaml
         exp_args = argparse.Namespace(
+            name = exp['name'],
             train=exp['train'],
             test=False,
             use_dropout=exp['use_dropout'],

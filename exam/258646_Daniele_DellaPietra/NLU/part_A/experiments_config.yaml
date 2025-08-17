@@ -14,7 +14,7 @@ experiments:
     epochs: 200
 
 
-  - name: base_dropout_no_bidirectional
+  - name: base_no_dropout_bidirectional
     batch_size: 128
     hidden_dim: 200
     embedding_dim: 300

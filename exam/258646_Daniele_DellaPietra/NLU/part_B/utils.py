@@ -10,7 +10,6 @@ from transformers import BertTokenizerFast, BertPreTrainedModel, BertModel,  get
 import torch.nn as nn
 
 PAD_TOKEN = 0
-UNK_TOKEN = 1
 def load_data(path):
     '''
         input: path/to/data

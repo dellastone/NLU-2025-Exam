@@ -176,7 +176,8 @@ def start_training(args):
         device=device,
         batch_size=args.batch_size
     )
-    
+    wandb.init(entity='della_stone',project="NLU", config=args, name = args.name)
+
     hid_size = args.hidden_dim
     emb_size = args.embedding_dim
 
@@ -191,6 +192,8 @@ def start_training(args):
     vocab_len = len(lang.word2id)
 
     model = ATISModel(hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, use_dropout=args.use_dropout, dropout=args.dropout, bidirectional=args.bidirectional, pad_index=PAD_TOKEN).to(device)
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+
     model.apply(init_weights)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -204,28 +207,33 @@ def start_training(args):
     for x in tqdm(range(1,n_epochs)):
         loss = train_loop(train_loader, optimizer, criterion_slots, 
                         criterion_intents, model, clip=clip)
-        if x % 5 == 0: # We check the performance every 5 epochs
-            sampled_epochs.append(x)
-            losses_train.append(np.asarray(loss).mean())
-            results_dev, intent_res, loss_dev = eval_loop(dev_loader, criterion_slots, 
-                                                        criterion_intents, model, lang)
-            losses_dev.append(np.asarray(loss_dev).mean())
-            
-            f1 = results_dev['total']['f']
-            # For decreasing the patience you can also use the average between slot f1 and intent accuracy
-            if f1 > best_f1:
-                best_f1 = f1
-                # Here you should save the model
-                patience = 3
-            else:
-                patience -= 1
-            if patience <= 0: # Early stopping with patience
-                break # Not nice but it keeps the code clean
+        sampled_epochs.append(x)
+        losses_train.append(np.asarray(loss).mean())
+        results_dev, intent_res, loss_dev = eval_loop(dev_loader, criterion_slots, 
+                                                    criterion_intents, model, lang)
+        losses_dev.append(np.asarray(loss_dev).mean())
+        
+        f1 = results_dev['total']['f']
+        loss = np.asarray(loss).mean()
+        loss_dev = np.asarray(loss_dev).mean()
+        #log to wandb
+        wandb.log({"loss": loss, "f1": f1, 'dev_loss': loss_dev})
+
+        # For decreasing the patience you can also use the average between slot f1 and intent accuracy
+        if f1 > best_f1:
+            best_f1 = f1
+            # Here you should save the model
+            patience = 3
+        else:
+            patience -= 1
+        if patience <= 0: # Early stopping with patience
+            break # Not nice but it keeps the code clean
 
     results_test, intent_test, _ = eval_loop(test_loader, criterion_slots, 
                                             criterion_intents, model, lang)    
     print('Slot F1: ', results_test['total']['f'])
     print('Intent Accuracy:', intent_test['accuracy'])
+    wandb.finish()
 
 
 def get_arguments():

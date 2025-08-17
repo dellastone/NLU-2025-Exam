@@ -14,6 +14,7 @@ from collections import Counter
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import warnings
+import wandb
 
 # Suppress HF future warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -69,11 +70,15 @@ def evaluate_bert_epoch(dataloader, model, tokenizer, lang):
     model.eval()
     all_refs, all_hyps = [], []
     intent_preds, intent_gts = [], []
+    dev_loss = 0.0
     with torch.no_grad():
         for batch in dataloader:
-            labels = batch.pop('slot_labels')
             batch = {k: v.to(device) for k, v in batch.items()}
             outputs = model(**batch)
+            loss = outputs['loss']
+            dev_loss += loss.item()
+            labels = batch.pop('slot_labels')
+
             slot_ids = outputs['slot_logits'].argmax(-1).cpu()
             intent_ids = outputs['intent_logits'].argmax(-1).cpu().tolist()
             intent_preds.extend(intent_ids)
@@ -88,6 +93,8 @@ def evaluate_bert_epoch(dataloader, model, tokenizer, lang):
                 hyp = [(tokens[pos], lang.id2slot[hyp_ids[pos]]) for pos in valid_positions]
                 all_refs.append(ref)
                 all_hyps.append(hyp)
+        dev_loss /= len(dataloader)
+        wandb.log({"dev_loss": dev_loss})
 
     slot_results = evaluate(all_refs, all_hyps)
     intent_acc = accuracy_score(intent_gts, intent_preds)
@@ -107,6 +114,8 @@ def start_training(args):
         num_intent_labels=len(lang.intent2id),
         num_slot_labels=len(lang.slot2id)
     ).to(device)
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+    wandb.init(entity='della_stone',project="NLU", config=args)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
     total_steps = len(train_loader) * args.epochs
@@ -123,7 +132,9 @@ def start_training(args):
         pbar = tqdm(train_loader, desc=f"Epoch {epoch} Training", leave=False)
         for batch in pbar:
             batch = {k: v.to(device) for k, v in batch.items()}
+            #print an example from batch
             outputs = model(**batch)
+            #print an example from outputs
             loss = outputs['loss']
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
@@ -135,7 +146,9 @@ def start_training(args):
         # Validation
         slot_dev, intent_dev = evaluate_bert_epoch(dev_loader, model, tokenizer, lang)
         f1 = slot_dev['total']['f']
+        dev_loss = slot_dev['total']['loss'] if 'loss' in slot_dev['total'] else 0.0
         print(f"Epoch {epoch}: TrainLoss={avg_train:.4f}, Dev Slot F1={f1:.4f}")
+        wandb.log({"loss": avg_train, "f1": f1})
         if f1 > best_f1:
             best_f1 = f1; patience = args.patience
             torch.save(model.state_dict(), 'best_bert.pt')
