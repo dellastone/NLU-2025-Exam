@@ -156,6 +156,7 @@ def start_training(args):
             wandb.log({"loss": avg_train, "f1": f1})
         if f1 > best_f1:
             best_f1 = f1; patience = args.patience
+            best_model = model.state_dict()
             if args.save_model:
                 os.makedirs('./bin', exist_ok=True)
                 torch.save(model.state_dict(), './bin/best_bert.pt')
@@ -166,7 +167,7 @@ def start_training(args):
                 break
 
     # Test
-    model.load_state_dict(torch.load('./bin/best_bert.pt'))
+    model.load_state_dict(best_model)
     slot_test, intent_test = evaluate_bert_epoch(test_loader, model, tokenizer, lang)
     print("Test Slot F1:", slot_test['total']['f'])
     print("Test Intent Acc:", intent_test['accuracy'])
